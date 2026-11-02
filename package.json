@@ -4,7 +4,7 @@
   "private": true,
   "description": "A simple API for resolving miniapp bundle information",
   "scripts": {
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "cloudinary": "^2.5.1",

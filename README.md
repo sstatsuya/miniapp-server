@@ -25,7 +25,6 @@ npm start
 
 Mặc định server chạy tại `http://localhost:3000`. Có thể cấu hình:
 
-- `PORT`: cổng server.
 - `MONGO_USERNAME`, `MONGO_PASSWORD`: thông tin đăng nhập MongoDB Atlas.
 - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: thông tin xác thực Cloudinary.
 - `CLOUDINARY_FOLDER`: thư mục lưu bundle trên Cloudinary (mặc định `miniapp-bundles`).
@@ -111,5 +110,20 @@ Trong lúc upload, manager dùng endpoint sau để lấy phần trăm thực t�
 
 `GET /api/miniapp/upload-v2/progress/:uploadId`
 
-Response mẫu: `{"progress":42,"status":"uploading"}`. Trạng thái gồm `receiving`, `processing`, `uploading`, `saving`, `complete` và `failed`. Các tiến độ được giữ tạm trong bộ nhớ server tối đa 30 phút.
+Response mẫu: `{"progress":42,"status":"uploading"}`. Trạng thái gồm `receiving`, `processing`, `uploading`, `saving`, `complete` và `failed`. Các tiến độ được lưu trong collection `uploadProgress` và tự xóa sau 30 phút.
+
+## Deploy API lên Vercel
+
+Tạo Vercel project với **Root Directory** trỏ tới thư mục `server`. Project dùng `api/index.js` làm Node.js Function và chuyển các request tới Express app.
+
+Cấu hình các environment variables trong Vercel:
+
+- `MONGO_USERNAME`, `MONGO_PASSWORD`
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+- `CORS_ORIGINS`: origin của manager, ví dụ `https://miniapp-manager.vercel.app` (nhiều origin cách nhau bằng dấu phẩy).
+
+Trong manager project, đặt `VITE_API_BASE_URL` thành URL API kèm `/api`, ví dụ `https://miniapp-server.vercel.app/api`, rồi deploy lại manager.
+
+Vercel giới hạn request body tới Function khoảng 4.5 MB. Vì vậy các endpoint upload trên Vercel giới hạn file ở 4 MB để dành chỗ cho multipart headers; TAR lớn hơn cần được upload trực tiếp tới object storage hoặc xử lý trên dịch vụ không có giới hạn body này.
+
 # miniapp-server
